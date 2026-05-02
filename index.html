@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenny's Recommendations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #141414;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Header with Toggle */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 10%, transparent);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #E50914;
+            letter-spacing: -1px;
+        }
+
+        .category-toggle {
+            display: flex;
+            gap: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .toggle-btn {
+            padding: 10px 24px;
+            background: transparent;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: #E50914;
+        }
+
+        .toggle-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Hero Carousel */
+        .hero {
+            position: relative;
+            height: 80vh;
+            margin-top: 0;
+            overflow: hidden;
+        }
+
+        .hero-carousel {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+
+        .hero-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 50px;
+            background: linear-gradient(90deg, #000 30%, transparent);
+        }
+
+        .hero-content {
+            max-width: 600px;
+            z-index: 10;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: #E50914;
+            padding: 5px 15px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.1;
+        }
+
+        .hero-meta {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        .hero-guests {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .hero-cover {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            height: 450px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            object-fit: cover;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 30px;
+            right: 50px;
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: #E50914;
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        /* Sections */
+        .section {
+            padding: 0 50px 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #e5e5e5;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+
+        .row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .card {
+            min-width: 200px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .card-cover {
+            width: 200px;
+            height: 300px;
+            border-radius: 4px;
+            object-fit: cover;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            background: #333;
+        }
+
+        .card-title {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #e5e5e5;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: #808080;
+        }
+
+        .recommendation-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #E50914;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 100px;
+            font-size: 24px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+                background: rgba(0,0,0,0.95);
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .category-toggle {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .toggle-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+
+            .hero {
+                height: 60vh;
+            }
+
+            .hero-slide {
+                padding: 0 20px;
+            }
+
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .hero-cover {
+                width: 200px;
+                height: 300px;
+                right: 20px;
+            }
+
+            .section {
+                padding: 0 20px 30px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .card {
+                min-width: 150px;
+            }
+
+            .card-cover {
+                width: 150px;
+                height: 225px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">LENNY'S PICKS</div>
+        <div class="category-toggle">
+            <button class="toggle-btn active" onclick="switchCategory('books')">📚 Books</button>
+            <button class="toggle-btn" onclick="switchCategory('movies')">🎬 Movies</button>
+            <button class="toggle-btn" onclick="switchCategory('tv')">📺 TV Shows</button>
+        </div>
+    </div>
+
+    <div id="content">
+        <div class="loading">Loading recommendations...</div>
+    </div>
+
+    <script>
+        let data = null;
+        let currentCategory = 'books';
+
+        // Load data
+        fetch('recommendations.json')
+            .then(res => res.json())
+            .then(loadedData => {
+                data = loadedData;
+                renderContent();
+            })
+            .catch(err => {
+                document.getElementById('content').innerHTML = '<div class="loading">Error loading data</div>';
+                console.error(err);
+            });
+
+        function switchCategory(category) {
+            currentCategory = category;
+
+            // Update button states
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderContent();
+        }
+
+        function renderContent() {
+            if (!data) return;
+
+            const items = currentCategory === 'books' ? data.books :
+                         currentCategory === 'movies' ? data.movies :
+                         data.tv_shows;
+
+            const categoryName = currentCategory === 'books' ? 'Books' :
+                               currentCategory === 'movies' ? 'Movies' : 'TV Shows';
+
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                ${renderHero(items.slice(0, 5))}
+                ${renderSection('Most Recommended ' + categoryName, items.filter(i => i.count >= 2))}
+                ${renderSection('All ' + categoryName, items)}
+            `;
+
+            // Reset carousel
+            currentSlide = 0;
+        }
+
+        function renderHero(items) {
+            return `
+                <div class="hero">
+                    <div class="hero-carousel" id="heroCarousel">
+                        ${items.map((item, i) => `
+                            <div class="hero-slide">
+                                <div class="hero-content">
+                                    <div class="hero-badge">#${i + 1} Most Recommended${item.count > 1 ? ` · ${item.count}× Recommended` : ''}</div>
+                                    <h1 class="hero-title">${item.title}</h1>
+                                    ${item.author ? `<div class="hero-meta">by ${item.author}</div>` : ''}
+                                    <p class="hero-description">${item.recommendations[0].description || 'Highly recommended by Lenny\'s guests'}</p>
+                                    ${item.count > 1 ? `
+                                        <div class="hero-guests">
+                                            <strong>Recommended by:</strong> ${item.recommendations.slice(0, 3).map(r => r.guest).join(', ')}${item.count > 3 ? ` and ${item.count - 3} more` : ''}
+                                        </div>
+                                    ` : `<div class="hero-guests"><strong>Recommended by:</strong> ${item.recommendations[0].guest}</div>`}
+                                </div>
+                                <img src="${getImagePath(item)}" class="hero-cover" onerror="this.src='https://via.placeholder.com/300x450?text=${encodeURIComponent(item.title)}'">
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="carousel-dots" id="carouselDots">
+                        ${items.map((_, i) => `<div class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></div>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSection(title, items) {
+            if (items.length === 0) return '';
+
+            // Split items into chunks of 20 for horizontal scrolling rows
+            const sections = [];
+            for (let i = 0; i < items.length; i += 20) {
+                const chunk = items.slice(i, i + 20);
+                const sectionTitle = i === 0 ? title : `${title.replace('All ', '')} (${i + 1}-${Math.min(i + 20, items.length)})`;
+                sections.push(`
+                    <div class="section">
+                        <h2 class="section-title">${sectionTitle}</h2>
+                        <div class="row">
+                            ${chunk.map(item => `
+                                <div class="card">
+                                    ${item.count > 1 ? `<div class="recommendation-badge">${item.count}× Recommended</div>` : ''}
+                                    <img src="${getImagePath(item)}" class="card-cover" onerror="this.src='https://via.placeholder.com/200x300?text=${encodeURIComponent(item.title)}'">
+                                    <div class="card-title">${item.title}</div>
+                                    ${item.author ? `<div class="card-subtitle">${item.author}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `);
+            }
+
+            return sections.join('');
+        }
+
+        function getImagePath(item) {
+            if (item.cover && item.cover !== 'N/A') {
+                return item.cover;
+            }
+
+            // Try to find image in local folders
+            if (currentCategory === 'books') {
+                // Normalize author name: replace / with -
+                const author = (item.author || 'N/A').replace(/\//g, '-');
+                return `images/books/${item.title}_${author}.jpg`;
+            } else if (currentCategory === 'movies') {
+                return `images/movies/${item.title}.jpg`;
+            } else {
+                return `images/tv/${item.title}.jpg`;
+            }
+        }
+
+        let currentSlide = 0;
+        function goToSlide(index) {
+            currentSlide = index;
+            const carousel = document.getElementById('heroCarousel');
+            if (carousel) {
+                carousel.style.transform = `translateX(-${index * 100}%)`;
+                document.querySelectorAll('.dot').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+            }
+        }
+
+        // Auto-advance carousel
+        setInterval(() => {
+            const carousel = document.getElementById('heroCarousel');
+            if (carousel && carousel.children.length > 0) {
+                currentSlide = (currentSlide + 1) % Math.min(5, carousel.children.length);
+                goToSlide(currentSlide);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

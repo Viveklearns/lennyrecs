@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenny's Book Recommendations - Rick Rubin Minimalist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #0A0A0A;
+            color: #E8E6E3;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 100px;
+            padding: 40px 0;
+        }
+
+        h1 {
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .tagline {
+            font-size: 56px;
+            font-weight: 300;
+            letter-spacing: -1px;
+            color: #E8E6E3;
+            margin-bottom: 40px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #888;
+            font-weight: 300;
+        }
+
+        /* Featured Book - Full Screen */
+        .featured {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 120px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .featured-content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 80px;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .featured-cover {
+            width: 100%;
+            border-radius: 2px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .featured:hover .featured-cover {
+            transform: scale(1.02);
+        }
+
+        .featured-info {
+            padding: 40px 0;
+        }
+
+        .featured-badge {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .featured-title {
+            font-size: 72px;
+            font-weight: 300;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .featured-author {
+            font-size: 24px;
+            color: #888;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .featured-quote {
+            font-size: 20px;
+            line-height: 1.8;
+            color: #B8B6B3;
+            font-style: italic;
+            border-left: 2px solid #333;
+            padding-left: 32px;
+            margin-bottom: 32px;
+        }
+
+        .featured-guests {
+            font-size: 14px;
+            color: #666;
+            line-height: 2;
+        }
+
+        .featured-guests strong {
+            color: #888;
+            font-weight: 400;
+        }
+
+        /* Navigation Dots */
+        .nav-dots {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #333;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-dot.active {
+            background: #E8E6E3;
+            height: 40px;
+            border-radius: 4px;
+        }
+
+        /* Grid Section */
+        .grid-section {
+            margin: 120px 0;
+        }
+
+        .grid-title {
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 60px 40px;
+        }
+
+        .book-item {
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .book-item:hover {
+            opacity: 0.7;
+        }
+
+        .book-cover-small {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+            border-radius: 2px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .book-count {
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .book-title-small {
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .book-author-small {
+            font-size: 13px;
+            color: #666;
+            font-weight: 300;
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #666;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .featured-content {
+                grid-template-columns: 300px 1fr;
+                gap: 60px;
+            }
+
+            .featured-title {
+                font-size: 56px;
+            }
+
+            .book-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 40px 30px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .tagline {
+                font-size: 42px;
+            }
+
+            .book-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .nav-dots {
+                right: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 24px;
+            }
+
+            header {
+                margin-bottom: 60px;
+            }
+
+            .tagline {
+                font-size: 32px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .featured-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .featured-cover {
+                max-width: 300px;
+                margin: 0 auto;
+            }
+
+            .featured-title {
+                font-size: 42px;
+            }
+
+            .featured-author {
+                font-size: 20px;
+            }
+
+            .featured-quote {
+                font-size: 18px;
+                padding-left: 20px;
+            }
+
+            .book-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 40px 24px;
+            }
+
+            .nav-dots {
+                display: none;
+            }
+
+            .scroll-indicator {
+                bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px 16px;
+            }
+
+            .tagline {
+                font-size: 24px;
+            }
+
+            .featured-title {
+                font-size: 32px;
+            }
+
+            .featured-author {
+                font-size: 18px;
+            }
+
+            .featured-quote {
+                font-size: 16px;
+            }
+
+            .book-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        section {
+            scroll-snap-align: start;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Lenny's Podcast</h1>
+            <div class="tagline">The Books That Shape<br>Product Leaders</div>
+            <div class="subtitle">Recommended by 295 guests · Curated by their wisdom</div>
+        </header>
+
+        <!-- Featured Books -->
+        <section class="featured" id="book1">
+            <div class="featured-content">
+                <img src="images/books/High Output Management_N-A.jpg" class="featured-cover" onerror="this.src='https://via.placeholder.com/400x600?text=High+Output+Management'">
+                <div class="featured-info">
+                    <div class="featured-badge">Most Recommended — 7 Times</div>
+                    <h2 class="featured-title">High Output<br>Management</h2>
+                    <div class="featured-author">Andy Grove</div>
+                    <p class="featured-quote">"The management bible. Essential reading for anyone building and scaling teams. Andy Grove's lessons from Intel remain as relevant today as when written."</p>
+                    <div class="featured-guests">
+                        <strong>Recommended by:</strong><br>
+                        Brendan Foody, Jeff Weinstein, Nabeel S. Qureshi,<br>
+                        Nick Turley, Nikita Miller, Patrick Campbell, Tomer Cohen
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured" id="book2">
+            <div class="featured-content">
+                <img src="images/books/Radical Candor_Kim Malone Scott.jpg" class="featured-cover" onerror="this.src='https://via.placeholder.com/400x600?text=Radical+Candor'">
+                <div class="featured-info">
+                    <div class="featured-badge">Essential Reading — 6 Times</div>
+                    <h2 class="featured-title">Radical<br>Candor</h2>
+                    <div class="featured-author">Kim Malone Scott</div>
+                    <p class="featured-quote">"Be a kick-ass boss without losing your humanity. The definitive guide to giving feedback that actually works and builds stronger teams."</p>
+                    <div class="featured-guests">
+                        <strong>Recommended by:</strong><br>
+                        Ada Chen Rekhi, Alisa Cohn, Barbra Gago,<br>
+                        Claire Butler, Kenneth Berger, Noah Weiss
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured" id="book3">
+            <div class="featured-content">
+                <img src="images/books/Shoe Dog_N-A.jpg" class="featured-cover" onerror="this.src='https://via.placeholder.com/400x600?text=Shoe+Dog'">
+                <div class="featured-info">
+                    <div class="featured-badge">Founder's Journey — 6 Times</div>
+                    <h2 class="featured-title">Shoe<br>Dog</h2>
+                    <div class="featured-author">Phil Knight</div>
+                    <p class="featured-quote">"The memoir of Nike's creator. A raw, honest story about building one of the world's most iconic brands from nothing. Inspiring and humbling in equal measure."</p>
+                    <div class="featured-guests">
+                        <strong>Recommended by:</strong><br>
+                        Brendan Foody, Brian Tolkin, Garrett Lord,<br>
+                        Grant Lee, Jonathan Becker, Zevi Arnovitz
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Grid Section -->
+        <section class="grid-section">
+            <h3 class="grid-title">More Essential Reading</h3>
+            <div class="book-grid" id="bookGrid"></div>
+        </section>
+    </div>
+
+    <div class="nav-dots">
+        <div class="nav-dot active" onclick="scrollToSection('book1')"></div>
+        <div class="nav-dot" onclick="scrollToSection('book2')"></div>
+        <div class="nav-dot" onclick="scrollToSection('book3')"></div>
+    </div>
+
+    <div class="scroll-indicator">Scroll to explore</div>
+
+    <script>
+        const moreBooks = [
+            { title: "The Hard Thing About Hard Things", author: "Ben Horowitz", count: 5, cover: "images/books/The Hard Thing About Hard Things_Ben Horowitz.jpg" },
+            { title: "Man's Search for Meaning", author: "Viktor Frankl", count: 5, cover: "images/books/Man's Search for Meaning_Viktor Frankl.jpg" },
+            { title: "Inspired", author: "Marty Cagan", count: 5, cover: "images/books/Inspired_Marty Cagan (SVPG).jpg" },
+            { title: "Scaling People", author: "Claire Hughes Johnson", count: 5, cover: "images/books/Scaling People_Claire Hughes Johnson.jpg" },
+            { title: "Thinking in Systems", author: "Donella Meadows", count: 4, cover: "images/books/Thinking in Systems_Donella Meadows.jpg" },
+            { title: "Thinking, Fast and Slow", author: "Daniel Kahneman", count: 4, cover: "images/books/Thinking, Fast and Slow_N-A.jpg" },
+            { title: "The Design of Everyday Things", author: "Don Norman", count: 4, cover: "images/books/The Design of Everyday Things_N-A.jpg" },
+            { title: "The Innovator's Dilemma", author: "Clayton Christensen", count: 4, cover: "images/books/The Innovator's Dilemma_Clayton Christensen.jpg" },
+            { title: "Atomic Habits", author: "James Clear", count: 3, cover: "images/books/Atomic Habits_N-A.jpg" },
+            { title: "Working Backwards", author: "Colin Bryar & Bill Carr", count: 3, cover: "images/books/Working Backwards_Colin Bryar & Bill Carr.jpg" }
+        ];
+
+        const grid = document.getElementById('bookGrid');
+        moreBooks.forEach(book => {
+            const item = document.createElement('div');
+            item.className = 'book-item';
+            item.innerHTML = `
+                <img src="${book.cover}" class="book-cover-small" onerror="this.src='https://via.placeholder.com/200x300?text=${book.title}'">
+                <div class="book-count">${book.count}× RECOMMENDED</div>
+                <div class="book-title-small">${book.title}</div>
+                <div class="book-author-small">${book.author}</div>
+            `;
+            grid.appendChild(item);
+        });
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Update active dot on scroll
+        window.addEventListener('scroll', () => {
+            const sections = ['book1', 'book2', 'book3'];
+            const dots = document.querySelectorAll('.nav-dot');
+
+            sections.forEach((id, index) => {
+                const section = document.getElementById(id);
+                const rect = section.getBoundingClientRect();
+
+                if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
+                    dots.forEach(dot => dot.classList.remove('active'));
+                    dots[index].classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

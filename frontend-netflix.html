@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenny's Book Recommendations - Netflix Style</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #141414;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 10%, transparent);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #E50914;
+            letter-spacing: -1px;
+        }
+
+        .hero {
+            position: relative;
+            height: 80vh;
+            margin-top: 0;
+            overflow: hidden;
+        }
+
+        .hero-carousel {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+
+        .hero-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 50px;
+            background: linear-gradient(90deg, #000 30%, transparent);
+        }
+
+        .hero-content {
+            max-width: 500px;
+            z-index: 10;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: #E50914;
+            padding: 5px 15px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.1;
+        }
+
+        .hero-meta {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #ddd;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: rgba(255,255,255,0.75);
+        }
+
+        .btn-secondary {
+            background: rgba(109, 109, 110, 0.7);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(109, 109, 110, 0.4);
+        }
+
+        .hero-cover {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            height: 450px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            object-fit: cover;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 30px;
+            right: 50px;
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: #E50914;
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        .section {
+            padding: 0 50px 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #e5e5e5;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+
+        .row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .book-card {
+            min-width: 200px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .book-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .book-cover {
+            width: 200px;
+            height: 300px;
+            border-radius: 4px;
+            object-fit: cover;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .book-title {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #e5e5e5;
+        }
+
+        .book-author {
+            font-size: 12px;
+            color: #808080;
+        }
+
+        .recommendation-count {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #E50914;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">LENNY'S BOOKS</div>
+    </div>
+
+    <div class="hero">
+        <div class="hero-carousel" id="heroCarousel">
+            <!-- Top 10 books will be inserted here -->
+        </div>
+        <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Most Recommended</h2>
+        <div class="row" id="mostRecommended"></div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Product & Business</h2>
+        <div class="row" id="productBusiness"></div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Recently Added</h2>
+        <div class="row" id="recentlyAdded"></div>
+    </div>
+
+    <script>
+        // Sample data - replace with your actual data
+        const topBooks = [
+            { title: "High Output Management", author: "Andy Grove", recommendations: 7, description: "The management bible recommended by 7 top product leaders including Brendan Foody, Jeff Weinstein, and Nabeel S. Qureshi. Essential reading for anyone building and scaling teams.", cover: "images/books/High Output Management_N-A.jpg" },
+            { title: "Radical Candor", author: "Kim Malone Scott", recommendations: 6, description: "Be a kick-ass boss without losing your humanity. Recommended by Ada Chen Rekhi, Alisa Cohn, and 4 others. The definitive guide to giving feedback that actually works.", cover: "images/books/Radical Candor_Kim Malone Scott.jpg" },
+            { title: "Shoe Dog", author: "Phil Knight", recommendations: 6, description: "The memoir of Nike's creator. A raw, honest story about building one of the world's most iconic brands from nothing. Recommended by Brendan Foody, Brian Tolkin, and 4 others.", cover: "images/books/Shoe Dog_N-A.jpg" },
+            { title: "The Hard Thing About Hard Things", author: "Ben Horowitz", recommendations: 5, description: "Building a business is hard. Managing people is even harder. Ben Horowitz's unflinching guide to the struggles of entrepreneurship, recommended by 5 product leaders.", cover: "images/books/The Hard Thing About Hard Things_Ben Horowitz.jpg" },
+            { title: "Man's Search for Meaning", author: "Viktor Frankl", recommendations: 5, description: "A psychiatrist's memoir from the concentration camps and the philosophy that kept him alive. Profound insights on finding purpose in any circumstance.", cover: "images/books/Man's Search for Meaning_Viktor Frankl.jpg" },
+            { title: "Inspired", author: "Marty Cagan", recommendations: 5, description: "How to create tech products customers love. The SVPG playbook recommended by Christine Itwaru, Marily Nika, and top product managers worldwide.", cover: "images/books/Inspired_Marty Cagan (SVPG).jpg" },
+            { title: "Thinking in Systems", author: "Donella Meadows", recommendations: 4, description: "See the patterns that shape our world. A primer on systems thinking that changes how you understand complexity and change.", cover: "images/books/Thinking in Systems_Donella Meadows.jpg" },
+            { title: "The Design of Everyday Things", author: "Don Norman", recommendations: 4, description: "Why doors confuse you and what it teaches about product design. The essential text on user-centered design thinking.", cover: "images/books/The Design of Everyday Things_N-A.jpg" },
+            { title: "The Innovator's Dilemma", author: "Clayton Christensen", recommendations: 4, description: "Why great companies fail. Clayton Christensen's classic on disruptive innovation and why success can lead to failure.", cover: "images/books/The Innovator's Dilemma_Clayton Christensen.jpg" },
+            { title: "Atomic Habits", author: "James Clear", recommendations: 3, description: "Tiny changes, remarkable results. The definitive guide to building good habits and breaking bad ones, one small step at a time.", cover: "images/books/Atomic Habits_N-A.jpg" }
+        ];
+
+        // Render hero carousel
+        const carousel = document.getElementById('heroCarousel');
+        const dots = document.getElementById('carouselDots');
+
+        topBooks.slice(0, 5).forEach((book, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'hero-slide';
+            slide.innerHTML = `
+                <div class="hero-content">
+                    <div class="hero-badge">#${index + 1} Most Recommended</div>
+                    <h1 class="hero-title">${book.title}</h1>
+                    <div class="hero-meta">by ${book.author} · Recommended ${book.recommendations} times</div>
+                    <p class="hero-description">${book.description}</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary">
+                            ▶ Read More
+                        </button>
+                        <button class="btn btn-secondary">
+                            ⓘ See Who Recommended
+                        </button>
+                    </div>
+                </div>
+                <img src="${book.cover}" class="hero-cover" onerror="this.src='https://via.placeholder.com/300x450?text=${book.title}'">
+            `;
+            carousel.appendChild(slide);
+
+            const dot = document.createElement('div');
+            dot.className = `dot ${index === 0 ? 'active' : ''}`;
+            dot.onclick = () => goToSlide(index);
+            dots.appendChild(dot);
+        });
+
+        let currentSlide = 0;
+        function goToSlide(index) {
+            currentSlide = index;
+            carousel.style.transform = `translateX(-${index * 100}%)`;
+            document.querySelectorAll('.dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        // Auto-advance carousel
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % 5;
+            goToSlide(currentSlide);
+        }, 5000);
+
+        // Render book rows
+        function renderBookRow(container, books) {
+            books.forEach(book => {
+                const card = document.createElement('div');
+                card.className = 'book-card';
+                card.innerHTML = `
+                    ${book.recommendations > 1 ? `<div class="recommendation-count">${book.recommendations}× Recommended</div>` : ''}
+                    <img src="${book.cover}" class="book-cover" onerror="this.src='https://via.placeholder.com/200x300?text=${book.title}'">
+                    <div class="book-title">${book.title}</div>
+                    <div class="book-author">${book.author}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        renderBookRow(document.getElementById('mostRecommended'), topBooks);
+        renderBookRow(document.getElementById('productBusiness'), topBooks.slice(5));
+        renderBookRow(document.getElementById('recentlyAdded'), topBooks.reverse());
+    </script>
+</body>
+</html>
