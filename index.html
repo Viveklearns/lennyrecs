@@ -238,6 +238,30 @@
             font-weight: bold;
         }
 
+        /* Metadata Badges */
+        .metadata-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .metadata-badge {
+            background: rgba(255,255,255,0.1);
+            color: #e5e5e5;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .card-meta {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
         /* Loading */
         .loading {
             text-align: center;
@@ -325,14 +349,18 @@
 
         // Load data
         fetch('recommendations.json')
-            .then(res => res.json())
+            .then(res => {
+                console.log('Fetch response:', res.status);
+                return res.json();
+            })
             .then(loadedData => {
+                console.log('Data loaded:', loadedData);
                 data = loadedData;
                 renderContent();
             })
             .catch(err => {
-                document.getElementById('content').innerHTML = '<div class="loading">Error loading data</div>';
-                console.error(err);
+                document.getElementById('content').innerHTML = '<div class="loading">Error loading data: ' + err.message + '</div>';
+                console.error('Error:', err);
             });
 
         function switchCategory(category) {
@@ -348,11 +376,16 @@
         }
 
         function renderContent() {
-            if (!data) return;
+            console.log('renderContent called, data:', data, 'category:', currentCategory);
+            if (!data) {
+                console.log('No data available');
+                return;
+            }
 
             const items = currentCategory === 'books' ? data.books :
                          currentCategory === 'movies' ? data.movies :
                          data.tv_shows;
+            console.log('Rendering items:', items.length);
 
             const categoryName = currentCategory === 'books' ? 'Books' :
                                currentCategory === 'movies' ? 'Movies' : 'TV Shows';
@@ -378,7 +411,8 @@
                                     <div class="hero-badge">#${i + 1} Most Recommended${item.count > 1 ? ` · ${item.count}× Recommended` : ''}</div>
                                     <h1 class="hero-title">${item.title}</h1>
                                     ${item.author ? `<div class="hero-meta">by ${item.author}</div>` : ''}
-                                    <p class="hero-description">${item.recommendations[0].description || 'Highly recommended by Lenny\'s guests'}</p>
+                                    ${getMetadataBadges(item)}
+                                    <p class="hero-description">${item.overview || item.recommendations[0].description || 'Highly recommended by Lenny\'s guests'}</p>
                                     ${item.count > 1 ? `
                                         <div class="hero-guests">
                                             <strong>Recommended by:</strong> ${item.recommendations.slice(0, 3).map(r => r.guest).join(', ')}${item.count > 3 ? ` and ${item.count - 3} more` : ''}
@@ -414,6 +448,7 @@
                                     <img src="${getImagePath(item)}" class="card-cover" onerror="this.src='https://via.placeholder.com/200x300?text=${encodeURIComponent(item.title)}'">
                                     <div class="card-title">${item.title}</div>
                                     ${item.author ? `<div class="card-subtitle">${item.author}</div>` : ''}
+                                    ${getCardMetadata(item)}
                                 </div>
                             `).join('')}
                         </div>
@@ -422,6 +457,63 @@
             }
 
             return sections.join('');
+        }
+
+        function getMetadataBadges(item) {
+            let badges = [];
+
+            // For books
+            if (item.category && item.category !== 'N/A') {
+                badges.push(`<span class="metadata-badge">${item.category}</span>`);
+            }
+
+            // For movies
+            if (item.genres && item.genres !== 'N/A') {
+                badges.push(`<span class="metadata-badge">${item.genres}</span>`);
+            }
+            if (item.runtime && item.runtime !== 'N/A') {
+                badges.push(`<span class="metadata-badge">${item.runtime} min</span>`);
+            }
+            if (item.rating && item.rating !== 'N/A') {
+                badges.push(`<span class="metadata-badge">⭐ ${item.rating}</span>`);
+            }
+
+            // For TV shows
+            if (item.seasons && item.seasons !== 'N/A') {
+                badges.push(`<span class="metadata-badge">${item.seasons} season${item.seasons != 1 ? 's' : ''}</span>`);
+            }
+            if (item.episodes && item.episodes !== 'N/A') {
+                badges.push(`<span class="metadata-badge">${item.episodes} episodes</span>`);
+            }
+            if (item.status && item.status !== 'N/A') {
+                badges.push(`<span class="metadata-badge">${item.status}</span>`);
+            }
+
+            return badges.length > 0 ? `<div class="metadata-badges">${badges.join('')}</div>` : '';
+        }
+
+        function getCardMetadata(item) {
+            let meta = [];
+
+            // For books - show category
+            if (item.category && item.category !== 'N/A') {
+                meta.push(`<div class="card-meta">${item.category}</div>`);
+            }
+
+            // For movies - show runtime and rating
+            if (item.runtime && item.runtime !== 'N/A') {
+                meta.push(`<div class="card-meta">${item.runtime} min</div>`);
+            }
+            if (item.rating && item.rating !== 'N/A') {
+                meta.push(`<div class="card-meta">⭐ ${item.rating}</div>`);
+            }
+
+            // For TV shows - show seasons and rating
+            if (item.seasons && item.seasons !== 'N/A') {
+                meta.push(`<div class="card-meta">${item.seasons} season${item.seasons != 1 ? 's' : ''}</div>`);
+            }
+
+            return meta.join('');
         }
 
         function getImagePath(item) {
