@@ -16,9 +16,11 @@ ENV/
 extracted/
 *.csv
 *.json
+# Allow recommendations.json for frontend
+!recommendations.json
 
-# Images
-images/
+# Images - allow images folder for frontend
+# images/
 
 # Logs
 *.log
