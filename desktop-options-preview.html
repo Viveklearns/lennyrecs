@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop Layout Options Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background: #14120e;
+            color: #fafaf7;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 32px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            color: rgba(250,250,247,0.6);
+            margin-bottom: 50px;
+            font-size: 15px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .option-card {
+            background: #fafaf7;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .option-header {
+            background: linear-gradient(135deg, #c46640, #8a3d20);
+            padding: 24px 28px;
+            color: #fafaf7;
+        }
+
+        .option-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            margin-bottom: 6px;
+        }
+
+        .option-title {
+            font-family: 'Fraunces', serif;
+            font-size: 26px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .option-desc {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .option-preview {
+            padding: 28px;
+            background: #ede9e0;
+            min-height: 400px;
+        }
+
+        .mockup {
+            background: #fafaf7;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(20,18,14,0.12);
+        }
+
+        /* Option 1: Multi-column Grid */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .grid-item {
+            text-align: center;
+        }
+
+        .grid-cover {
+            width: 100%;
+            aspect-ratio: 2/3;
+            background: linear-gradient(135deg, #e8e4dc, #d8d2c5);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fraunces', serif;
+            font-size: 18px;
+            color: rgba(20,18,14,0.4);
+        }
+
+        .grid-title {
+            font-family: 'Fraunces', serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: #14120e;
+            margin-bottom: 3px;
+        }
+
+        .grid-author {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-size: 11px;
+            color: rgba(20,18,14,0.55);
+        }
+
+        /* Option 2: Sidebar Layout */
+        .sidebar-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 32px;
+        }
+
+        .sidebar-featured {
+            background: linear-gradient(135deg, #e8e4dc, #d8d2c5);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .sidebar-featured-cover {
+            width: 140px;
+            height: 200px;
+            background: #fff;
+            margin: 0 auto 16px;
+            border-radius: 6px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .sidebar-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sidebar-row {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 12px;
+            padding: 12px;
+            background: #f4f1eb;
+            border-radius: 8px;
+        }
+
+        .sidebar-row-cover {
+            width: 60px;
+            height: 85px;
+            background: linear-gradient(135deg, #e8e4dc, #d8d2c5);
+            border-radius: 4px;
+        }
+
+        .sidebar-row-title {
+            font-family: 'Fraunces', serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #14120e;
+        }
+
+        /* Option 3: Wider Single Column */
+        .wide-layout {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .wide-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 24px;
+            padding: 24px 0;
+            border-bottom: 1px solid #ece7de;
+        }
+
+        .wide-cover {
+            width: 140px;
+            height: 200px;
+            background: linear-gradient(135deg, #e8e4dc, #d8d2c5);
+            border-radius: 6px;
+        }
+
+        .wide-content {
+            padding-top: 8px;
+        }
+
+        .wide-title {
+            font-family: 'Fraunces', serif;
+            font-size: 22px;
+            font-weight: 500;
+            color: #14120e;
+            margin-bottom: 6px;
+        }
+
+        .wide-author {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-size: 15px;
+            color: rgba(20,18,14,0.55);
+            margin-bottom: 12px;
+        }
+
+        .wide-avatars {
+            display: flex;
+            gap: -8px;
+        }
+
+        .wide-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #c46640, #8a3d20);
+            border: 2px solid #fafaf7;
+            margin-left: -8px;
+        }
+
+        .wide-avatar:first-child {
+            margin-left: 0;
+        }
+
+        /* Option 4: Full Width */
+        .fullwidth-layout {
+            max-width: 100%;
+        }
+
+        .fullwidth-note {
+            background: #f4f1eb;
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            color: rgba(20,18,14,0.7);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .impact-note {
+            background: #2a2620;
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-top: 40px;
+            border: 1px solid rgba(250,250,247,0.1);
+        }
+
+        .impact-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(250,250,247,0.5);
+            margin-bottom: 12px;
+        }
+
+        .impact-text {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(250,250,247,0.85);
+        }
+
+        .impact-text strong {
+            color: #c46640;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Desktop Layout Options</h1>
+        <p class="subtitle">All options preserve the exact mobile experience — these only affect screens ≥768px wide</p>
+
+        <div class="options-grid">
+            <!-- Option 1 -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-number">Option 1</div>
+                    <div class="option-title">Multi-Column Grid</div>
+                    <div class="option-desc">Show 2-3 books side by side in a Pinterest-style grid. Makes browsing faster, fits more on screen.</div>
+                </div>
+                <div class="option-preview">
+                    <div class="mockup">
+                        <div class="grid-layout">
+                            <div class="grid-item">
+                                <div class="grid-cover">📚</div>
+                                <div class="grid-title">The Hard Thing About Hard Things</div>
+                                <div class="grid-author">Ben Horowitz</div>
+                            </div>
+                            <div class="grid-item">
+                                <div class="grid-cover">📚</div>
+                                <div class="grid-title">Zero to One</div>
+                                <div class="grid-author">Peter Thiel</div>
+                            </div>
+                            <div class="grid-item">
+                                <div class="grid-cover">📚</div>
+                                <div class="grid-title">High Growth Handbook</div>
+                                <div class="grid-author">Elad Gil</div>
+                            </div>
+                            <div class="grid-item">
+                                <div class="grid-cover">📚</div>
+                                <div class="grid-title">Inspired</div>
+                                <div class="grid-author">Marty Cagan</div>
+                            </div>
+                            <div class="grid-item">
+                                <div class="grid-cover">📚</div>
+                                <div class="grid-title">The Mom Test</div>
+                                <div class="grid-author">Rob Fitzpatrick</div>
+                            </div>
+                            <div class="grid-item">
+                                <div class="grid-cover">📚</div>
+                                <div class="grid-title">Crossing the Chasm</div>
+                                <div class="grid-author">Geoffrey Moore</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Option 2 -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-number">Option 2</div>
+                    <div class="option-title">Sidebar Layout</div>
+                    <div class="option-desc">Featured book stays visible on left while you scroll the list on right. Magazine-style editorial feel.</div>
+                </div>
+                <div class="option-preview">
+                    <div class="mockup">
+                        <div class="sidebar-layout">
+                            <div class="sidebar-featured">
+                                <div class="sidebar-featured-cover"></div>
+                                <div style="font-family: 'Fraunces', serif; font-size: 16px; font-weight: 500; color: #14120e; margin-bottom: 4px;">The Hard Thing</div>
+                                <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 12px; color: rgba(20,18,14,0.55);">Ben Horowitz</div>
+                            </div>
+                            <div class="sidebar-list">
+                                <div class="sidebar-row">
+                                    <div class="sidebar-row-cover"></div>
+                                    <div>
+                                        <div class="sidebar-row-title">Zero to One</div>
+                                        <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 11px; color: rgba(20,18,14,0.55);">Peter Thiel</div>
+                                    </div>
+                                </div>
+                                <div class="sidebar-row">
+                                    <div class="sidebar-row-cover"></div>
+                                    <div>
+                                        <div class="sidebar-row-title">High Growth Handbook</div>
+                                        <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 11px; color: rgba(20,18,14,0.55);">Elad Gil</div>
+                                    </div>
+                                </div>
+                                <div class="sidebar-row">
+                                    <div class="sidebar-row-cover"></div>
+                                    <div>
+                                        <div class="sidebar-row-title">Inspired</div>
+                                        <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 11px; color: rgba(20,18,14,0.55);">Marty Cagan</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Option 3 -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-number">Option 3</div>
+                    <div class="option-title">Wider Single Column</div>
+                    <div class="option-desc">Keep the same vertical flow but use more width (700-900px). Larger covers, more breathing room, same reading pattern.</div>
+                </div>
+                <div class="option-preview">
+                    <div class="mockup">
+                        <div class="wide-layout">
+                            <div class="wide-row">
+                                <div class="wide-cover"></div>
+                                <div class="wide-content">
+                                    <div class="wide-title">The Hard Thing About Hard Things</div>
+                                    <div class="wide-author">Ben Horowitz</div>
+                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: rgba(20,18,14,0.5); margin-bottom: 8px;">Recommended by 12 people</div>
+                                    <div class="wide-avatars">
+                                        <div class="wide-avatar"></div>
+                                        <div class="wide-avatar"></div>
+                                        <div class="wide-avatar"></div>
+                                        <div class="wide-avatar"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="wide-row">
+                                <div class="wide-cover"></div>
+                                <div class="wide-content">
+                                    <div class="wide-title">Zero to One</div>
+                                    <div class="wide-author">Peter Thiel</div>
+                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: rgba(20,18,14,0.5); margin-bottom: 8px;">Recommended by 8 people</div>
+                                    <div class="wide-avatars">
+                                        <div class="wide-avatar"></div>
+                                        <div class="wide-avatar"></div>
+                                        <div class="wide-avatar"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Option 4 -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-number">Option 4</div>
+                    <div class="option-title">Full Width (No Desktop Changes)</div>
+                    <div class="option-desc">Keep it exactly as is — let the mobile layout stretch to full desktop width. Simple, no special handling needed.</div>
+                </div>
+                <div class="option-preview">
+                    <div class="mockup fullwidth-layout">
+                        <div class="fullwidth-note">
+                            The mobile design would stretch to fill the entire browser width on desktop.<br><br>
+                            Everything stays the same, just wider. Book covers, text, and spacing all scale up proportionally.<br><br>
+                            This is the simplest approach — no responsive code needed.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="impact-note">
+            <div class="impact-title">📱 Impact on Mobile View</div>
+            <div class="impact-text">
+                <strong>Zero impact.</strong> All of these options use CSS media queries that only activate on screens ≥768px wide. Your phone will always show the current mobile design exactly as it is now — single column, full width, with all the same spacing and sizing. You'd only see these desktop layouts when viewing on a laptop or desktop computer.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

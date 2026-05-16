@@ -13,7 +13,37 @@ This project extracts recommendations from 295 podcast episodes, downloads cover
 - ✅ 98% book cover success rate
 - ✅ Complete audit trail of all API attempts
 
-## Quick Start
+## Quick Start - View the Site
+
+### Running Locally
+
+```bash
+python3 main.py
+```
+
+Then visit:
+- http://localhost:8000/index.html (Netflix version)
+- http://localhost:8000/index-quiet.html (Quiet editorial version)
+
+### Deploying to Replit
+
+1. Go to https://replit.com and create a new Repl
+2. Choose "Import from GitHub" or "Upload files"
+3. Upload these files:
+   - `main.py` (Python server)
+   - `index.html` (Netflix version)
+   - `index-quiet.html` (Quiet version)
+   - `recommendations.json` (all data)
+   - `images/` folder (all book/movie/TV images)
+   - `.replit` and `replit.nix` (configuration files)
+4. Click "Run" - Replit will start the server automatically
+5. Share the public URL
+
+The site will be live at `https://your-repl-name.your-username.repl.co`
+
+## Data Extraction (Advanced)
+
+If you want to re-extract or modify the data:
 
 ```bash
 # 1. Install dependencies
@@ -30,10 +60,6 @@ python3 enrich_movies.py
 
 # 5. Generate frontend JSON
 python3 convert_csv_to_json.py
-
-# 6. View results
-python3 -m http.server 8000
-# Open http://localhost:8000/index.html
 ```
 
 ## File Structure

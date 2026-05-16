@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenny's Recommendations — Quiet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: oklch(0.965 0.012 82);
+            --paper-warm: oklch(0.945 0.022 78);
+            --ink: oklch(0.22 0.015 60);
+            --ink-soft: oklch(0.48 0.020 60);
+            --rule: oklch(0.82 0.015 70);
+            --rule-soft: oklch(0.88 0.012 70);
+            --accent: oklch(0.58 0.13 38);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background: #fafaf7;
+            color: #14120e;
+            overflow-x: hidden;
+        }
+
+        /* Desktop: wider single column layout */
+        @media (min-width: 768px) {
+            body {
+                background: #ede9e0;
+            }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100%;
+                max-width: 900px;
+                height: 100%;
+                background: #fafaf7;
+                box-shadow: 0 0 60px rgba(20,18,14,0.12);
+                z-index: -1;
+            }
+
+            .header,
+            .kicker,
+            .category-toggle,
+            #content {
+                max-width: 900px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            /* Larger covers and spacing */
+            .featured {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .featured-cover {
+                width: 280px;
+                height: 400px;
+            }
+
+            .row {
+                grid-template-columns: 180px 1fr;
+                gap: 28px;
+                padding: 32px 0;
+            }
+
+            .row-cover-wrap {
+                width: 180px;
+                height: 260px;
+            }
+
+            .row-cover {
+                width: 180px;
+                height: 260px;
+            }
+
+            .row-title {
+                font-size: 22px;
+            }
+
+            .row-author {
+                font-size: 15px;
+                margin-top: 4px;
+            }
+
+            .avatar-small {
+                width: 36px;
+                height: 36px;
+            }
+
+            .recommender-label {
+                font-size: 10px;
+                margin-bottom: 8px;
+            }
+
+            .recommender-count {
+                font-size: 12px;
+            }
+
+            .list-section {
+                padding: 24px 40px 140px;
+            }
+
+            .featured {
+                padding: 32px 40px;
+            }
+
+            .header {
+                padding: 28px 40px 0;
+            }
+
+            .kicker {
+                padding: 6px 40px 0;
+            }
+
+            .category-toggle {
+                padding: 24px 40px;
+            }
+
+            .divider {
+                margin: 48px 40px 0;
+            }
+        }
+
+        /* Header */
+        .header {
+            padding: 20px 26px 0;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 22px;
+            font-weight: 500;
+            letter-spacing: -0.5px;
+        }
+
+        .search-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: #e8e4dc;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .kicker {
+            padding: 4px 26px 0;
+            font-size: 13px;
+            color: rgba(20,18,14,0.5);
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+        }
+
+        /* Category Toggle */
+        .category-toggle {
+            display: flex;
+            gap: 8px;
+            padding: 20px 26px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .category-toggle::-webkit-scrollbar {
+            display: none;
+        }
+
+        .toggle-btn {
+            padding: 10px 18px;
+            background: transparent;
+            color: rgba(20,18,14,0.6);
+            border: 1px solid #ece7de;
+            border-radius: 999px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: #14120e;
+            color: #fafaf7;
+            border-color: #14120e;
+        }
+
+        .toggle-btn:hover:not(.active) {
+            background: #f4f1eb;
+        }
+
+        /* Featured Section */
+        .featured {
+            margin: 34px 22px 0;
+            cursor: pointer;
+        }
+
+        .featured-cover-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .featured-cover {
+            width: 168px;
+            height: 244px;
+            border-radius: 4px;
+            object-fit: cover;
+            filter: drop-shadow(0 24px 40px rgba(0,0,0,0.15)) drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            background: #e8e4dc;
+        }
+
+        .featured-cover-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .featured-meta {
+            text-align: center;
+            padding: 0 4px;
+        }
+
+        .featured-badge {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 9.5px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(20,18,14,0.45);
+            margin-bottom: 10px;
+        }
+
+        .featured-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 28px;
+            font-weight: 400;
+            line-height: 1.05;
+            letter-spacing: -0.8px;
+        }
+
+        .featured-author {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-size: 15px;
+            color: rgba(20,18,14,0.6);
+            margin-top: 4px;
+        }
+
+        /* Recommender Chip */
+        .recommender-chip {
+            margin-top: 22px;
+            padding: 12px 14px;
+            background: #fff;
+            border: 1px solid #ece7de;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .recommender-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #c46640, #8a3d20);
+            flex-shrink: 0;
+            font-family: 'Fraunces', serif;
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .recommender-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 999px;
+            object-fit: cover;
+        }
+
+        .recommender-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .recommender-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #14120e;
+        }
+
+        .recommender-episode {
+            font-size: 11.5px;
+            color: rgba(20,18,14,0.55);
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .play-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 999px;
+            border: none;
+            background: #14120e;
+            color: #fafaf7;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Quote */
+        .featured-quote {
+            margin-top: 18px;
+            padding: 0 4px;
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 19px;
+            line-height: 1.4;
+            font-style: italic;
+            color: rgba(20,18,14,0.85);
+            text-align: center;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: #ece7de;
+            margin: 38px 26px 0;
+        }
+
+        /* List Section */
+        .list-section {
+            padding: 18px 22px 140px;
+        }
+
+        .list-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+            margin-bottom: 2px;
+        }
+
+        .list-subtitle {
+            font-size: 13px;
+            color: rgba(20,18,14,0.5);
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            margin-bottom: 14px;
+        }
+
+        /* Rows */
+        .row {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            gap: 16px;
+            padding: 20px 0;
+            border-bottom: 1px solid #ece7de;
+            cursor: pointer;
+            align-items: start;
+        }
+
+        .row:hover {
+            opacity: 0.8;
+        }
+
+        .row-cover {
+            width: 90px;
+            height: 130px;
+            border-radius: 4px;
+            object-fit: cover;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.12));
+            background: #e8e4dc;
+        }
+
+        .row-cover-wrap {
+            position: relative;
+            width: 90px;
+            height: 130px;
+        }
+
+        .rec-badge {
+            display: inline-block;
+            background: rgba(20,18,14,0.92);
+            backdrop-filter: blur(8px);
+            color: #fafaf7;
+            padding: 4px 9px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .rec-badge.high {
+            background: rgba(196,102,64,0.95);
+        }
+
+        .rec-badge.medium {
+            background: rgba(20,18,14,0.92);
+        }
+
+        .rec-badge.low {
+            background: rgba(20,18,14,0.75);
+        }
+
+        .row-content {
+            min-width: 0;
+        }
+
+        .row-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+            line-height: 1.15;
+        }
+
+        .row-author {
+            font-size: 13px;
+            color: rgba(20,18,14,0.55);
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        .row-quote {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-size: 14.5px;
+            line-height: 1.4;
+            color: rgba(20,18,14,0.78);
+            margin-top: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .row-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            color: rgba(20,18,14,0.5);
+        }
+
+        .row-meta-host {
+            text-transform: uppercase;
+            font-weight: 600;
+            color: rgba(20,18,14,0.7);
+        }
+
+        .recommender-avatars {
+            margin-top: 10px;
+        }
+
+        .recommender-label {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 9px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(20,18,14,0.5);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .avatar-small {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            border: 2px solid #fafaf7;
+            margin-left: -10px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #c46640, #8a3d20);
+        }
+
+        .avatar-small:first-child {
+            margin-left: 0;
+        }
+
+        .recommender-count {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 11px;
+            color: rgba(20,18,14,0.6);
+            margin-left: 4px;
+        }
+
+        /* Detail Sheet */
+        .detail-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(20,16,12,0.4);
+            z-index: 100;
+            display: none;
+            align-items: flex-end;
+            animation: fadeIn 0.22s ease forwards;
+        }
+
+        .detail-backdrop.open {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { background: rgba(20,16,12,0); }
+            to { background: rgba(20,16,12,0.4); }
+        }
+
+        .detail-sheet {
+            width: 100%;
+            background: var(--paper);
+            border-top-left-radius: 26px;
+            border-top-right-radius: 26px;
+            max-height: 92%;
+            overflow: auto;
+            font-family: 'Instrument Serif', Georgia, serif;
+            box-shadow: 0 -12px 40px rgba(0,0,0,0.2);
+            animation: slideUp 0.32s cubic-bezier(.2,.9,.25,1) forwards;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* Desktop: center detail sheet */
+        @media (min-width: 768px) {
+            .detail-backdrop {
+                align-items: center;
+                justify-content: center;
+            }
+
+            .detail-sheet {
+                width: 700px;
+                max-height: 90vh;
+                border-radius: 26px;
+                animation: scaleUp 0.32s cubic-bezier(.2,.9,.25,1) forwards;
+            }
+
+            @keyframes scaleUp {
+                from {
+                    transform: scale(0.92);
+                    opacity: 0;
+                }
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+        }
+
+        .detail-handle {
+            display: flex;
+            justify-content: center;
+            padding: 10px 0 0;
+        }
+
+        .detail-handle-bar {
+            width: 40px;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--rule);
+        }
+
+        .detail-hero {
+            padding: 24px 24px 28px;
+            color: #fff;
+            position: relative;
+        }
+
+        .detail-badge {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 9.5px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .detail-title-grid {
+            display: grid;
+            grid-template-columns: 1fr 92px;
+            gap: 16px;
+            align-items: end;
+            margin-top: 14px;
+        }
+
+        .detail-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 34px;
+            font-weight: 400;
+            letter-spacing: -1px;
+            line-height: 0.98;
+        }
+
+        .detail-author {
+            font-size: 15px;
+            font-style: italic;
+            opacity: 0.9;
+            margin-top: 6px;
+        }
+
+        .detail-cover {
+            width: 92px;
+            height: 132px;
+            border-radius: 4px;
+            object-fit: cover;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .detail-actions {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            padding: 18px 24px 6px;
+        }
+
+        .detail-btn-primary {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 999px;
+            background: var(--ink);
+            color: var(--paper);
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .detail-btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            border: 1px solid var(--rule);
+            background: transparent;
+            color: var(--ink);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .detail-quote {
+            padding: 20px 24px 4px;
+        }
+
+        .detail-quote-label {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 9.5px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            margin-bottom: 10px;
+        }
+
+        .detail-quote-content {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .detail-quote-bar {
+            width: 2px;
+            align-self: stretch;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .detail-quote-text {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 19px;
+            line-height: 1.38;
+            font-style: italic;
+        }
+
+        .detail-episode {
+            margin: 20px 20px 40px;
+            padding: 14px 16px;
+            border: 1px solid var(--rule);
+            border-radius: 10px;
+            background: var(--paper-warm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .detail-episode-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--ink);
+            color: var(--paper);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .detail-episode-host {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: -0.2px;
+            line-height: 1.15;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .detail-episode-title {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--ink-soft);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            font-family: 'Instrument Serif', serif;
+            font-size: 18px;
+            color: rgba(20,18,14,0.5);
+        }
+
+        /* Timeline styles for detail view */
+        .sticky-actions {
+            position: sticky;
+            top: 0;
+            background: rgba(250,250,247,0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--rule);
+            z-index: 10;
+            display: flex;
+            gap: 10px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 16px 24px;
+            background: #f4f1eb;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .meta-item {
+            text-align: center;
+        }
+
+        .meta-value {
+            font-family: 'Fraunces', serif;
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .meta-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(20,18,14,0.5);
+        }
+
+        .about-section {
+            padding: 20px 24px;
+            background: #fff;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .about-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(20,18,14,0.5);
+            margin-bottom: 8px;
+        }
+
+        .about-text {
+            font-family: 'Instrument Serif', serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(20,18,14,0.8);
+        }
+
+        .timeline-section {
+            padding: 24px;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timeline-title {
+            font-family: 'Fraunces', serif;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .timeline-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: rgba(20,18,14,0.5);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--rule);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #fff;
+            border: 1px solid var(--rule);
+            border-radius: 12px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 24px;
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: var(--accent);
+            border: 3px solid var(--paper);
+            z-index: 2;
+        }
+
+        .timeline-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: rgba(20,18,14,0.5);
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .rec-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .guest-photo {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #c46640, #8a3d20);
+            flex-shrink: 0;
+        }
+
+        .guest-info h4 {
+            font-family: 'Fraunces', serif;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .guest-episode {
+            font-size: 11px;
+            color: rgba(20,18,14,0.5);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .rec-quote-timeline {
+            font-family: 'Instrument Serif', serif;
+            font-size: 14px;
+            font-style: italic;
+            line-height: 1.5;
+            color: rgba(20,18,14,0.8);
+            padding-left: 12px;
+            border-left: 3px solid var(--rule);
+            margin-bottom: 10px;
+        }
+
+        .listen-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f4f1eb;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .listen-link:hover {
+            background: var(--ink);
+            color: var(--paper);
+            border-color: var(--ink);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Today</div>
+        <button class="search-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#14120e" stroke-width="1.8">
+                <circle cx="6" cy="6" r="4.5"/>
+                <path d="M13 13l-4-4"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="kicker" id="kicker">Loading...</div>
+
+    <div class="category-toggle">
+        <button class="toggle-btn active" onclick="switchCategory('books')">📚 Books</button>
+        <button class="toggle-btn" onclick="switchCategory('movies')">🎬 Movies</button>
+        <button class="toggle-btn" onclick="switchCategory('tv')">📺 TV Shows</button>
+    </div>
+
+    <div id="content">
+        <div class="loading">Loading recommendations...</div>
+    </div>
+
+    <!-- Detail Sheet -->
+    <div class="detail-backdrop" id="detailBackdrop" onclick="closeDetail()">
+        <div class="detail-sheet" onclick="event.stopPropagation()">
+            <div class="detail-handle">
+                <div class="detail-handle-bar"></div>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let data = null;
+        let currentCategory = 'books';
+
+        // Load data
+        fetch('recommendations.json')
+            .then(res => res.json())
+            .then(loadedData => {
+                data = loadedData;
+                renderContent();
+            })
+            .catch(err => {
+                document.getElementById('content').innerHTML = '<div class="loading">Error loading data: ' + err.message + '</div>';
+                console.error('Error:', err);
+            });
+
+        function switchCategory(category) {
+            currentCategory = category;
+
+            // Update button states
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderContent();
+        }
+
+        function renderContent() {
+            if (!data) return;
+
+            const items = currentCategory === 'books' ? data.books :
+                         currentCategory === 'movies' ? data.movies :
+                         data.tv_shows;
+
+            const categoryName = currentCategory === 'books' ? 'Books' :
+                               currentCategory === 'movies' ? 'Movies' : 'TV Shows';
+
+            // Update kicker
+            const totalRecs = items.reduce((sum, item) => sum + item.count, 0);
+            const uniqueGuests = new Set(items.flatMap(item => item.recommendations.map(r => r.guest))).size;
+            document.getElementById('kicker').textContent =
+                `${items.length} ${categoryName.toLowerCase()} · ${totalRecs} recommendations from ${uniqueGuests} guests`;
+
+            const featured = items[0];
+            const rest = items.slice(1);
+
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                ${renderFeatured(featured)}
+                <div class="divider"></div>
+                <div class="list-section">
+                    <div class="list-title">More from this collection</div>
+                    <div class="list-subtitle">${rest.length} ${categoryName.toLowerCase()} recommended by Lenny's guests</div>
+                    ${rest.map(item => renderRow(item)).join('')}
+                </div>
+            `;
+        }
+
+        function renderFeatured(item) {
+            const firstRec = item.recommendations[0];
+            const description = item.overview || firstRec.description || 'Highly recommended';
+            const badgeClass = item.count >= 10 ? 'high' : item.count >= 5 ? 'medium' : 'low';
+
+            // Get up to 5 recommender photos for featured
+            const avatarsToShow = item.recommendations.slice(0, 5);
+            const remainingCount = item.count > 5 ? item.count - 5 : 0;
+
+            return `
+                <div class="featured" onclick="openDetail(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                    <div class="featured-cover-wrap">
+                        <img src="${getImagePath(item)}"
+                             class="featured-cover"
+                             onerror="this.src='https://via.placeholder.com/168x244?text=${encodeURIComponent(item.title)}'">
+                    </div>
+                    <div class="featured-meta">
+                        <div class="featured-badge">Most recommended</div>
+                        <div class="featured-title">${item.title}</div>
+                        ${item.author ? `<div class="featured-author">${item.author}</div>` : ''}
+                    </div>
+                    <div style="padding: 0 28px; margin-top: 16px;">
+                        <div class="recommender-label" style="justify-content: center;">
+                            Recommended by ${item.count} ${item.count === 1 ? 'person' : 'people'}
+                        </div>
+                        <div class="avatar-group" style="justify-content: center; margin-top: 8px;">
+                            ${avatarsToShow.map(rec => {
+                                const photoUrl = `https://i.pravatar.cc/150?img=${(rec.guest.charCodeAt(0) % 70) + 1}`;
+                                return `<img src="${photoUrl}" class="avatar-small" alt="${rec.guest}" title="${rec.guest}">`;
+                            }).join('')}
+                            ${remainingCount > 0 ? `<span class="recommender-count">+${remainingCount} more</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRow(item) {
+            const firstRec = item.recommendations[0];
+            const badgeClass = item.count >= 10 ? 'high' : item.count >= 5 ? 'medium' : 'low';
+
+            // Get up to 4 recommender photos
+            const avatarsToShow = item.recommendations.slice(0, 4);
+            const remainingCount = item.count > 4 ? item.count - 4 : 0;
+
+            return `
+                <div class="row" onclick="openDetail(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                    <div class="row-cover-wrap">
+                        <img src="${getImagePath(item)}"
+                             class="row-cover"
+                             onerror="this.src='https://via.placeholder.com/90x130?text=${encodeURIComponent(item.title.substring(0, 3))}'">
+                    </div>
+                    <div class="row-content">
+                        <div class="row-title">${item.title}</div>
+                        ${item.author ? `<div class="row-author">${item.author}</div>` : ''}
+                        <div class="recommender-avatars">
+                            <div class="recommender-label">
+                                Recommended by ${item.count} ${item.count === 1 ? 'person' : 'people'}
+                            </div>
+                            <div class="avatar-group">
+                                ${avatarsToShow.map(rec => {
+                                    const photoUrl = `https://i.pravatar.cc/150?img=${(rec.guest.charCodeAt(0) % 70) + 1}`;
+                                    return `<img src="${photoUrl}" class="avatar-small" alt="${rec.guest}" title="${rec.guest}">`;
+                                }).join('')}
+                                ${remainingCount > 0 ? `<span class="recommender-count">+${remainingCount} more</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getImagePath(item) {
+            if (item.cover && item.cover !== 'N/A') {
+                return item.cover;
+            }
+
+            if (currentCategory === 'books') {
+                const author = (item.author || 'N/A').replace(/\//g, '-');
+                return `images/books/${item.title}_${author}.jpg`;
+            } else if (currentCategory === 'movies') {
+                return `images/movies/${item.title}.jpg`;
+            } else {
+                return `images/tv/${item.title}.jpg`;
+            }
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        }
+
+        function openDetail(item) {
+            const firstRec = item.recommendations[0];
+            const description = item.overview || firstRec.description || 'Highly recommended';
+            const tintColor = item.tint || '#c46640';
+
+            // Get Amazon link based on item type
+            const amazonLink = getAmazonLink(item);
+
+            // Get rating if available
+            const rating = item.rating && item.rating !== 'N/A' ? item.rating : null;
+            const year = item.year || (item.author ? '2024' : 'N/A');
+
+            document.getElementById('detailContent').innerHTML = `
+                <div class="detail-hero" style="background: linear-gradient(180deg, ${tintColor}, color-mix(in oklab, ${tintColor} 82%, #000));">
+                    <div class="detail-badge">${currentCategory} · ${item.count}× recommended</div>
+                    <div class="detail-title-grid">
+                        <div>
+                            <div class="detail-title">${item.title}</div>
+                            <div class="detail-author">${item.author || 'Various'}</div>
+                        </div>
+                        <img src="${getImagePath(item)}"
+                             class="detail-cover"
+                             onerror="this.src='https://via.placeholder.com/92x132?text=${encodeURIComponent(item.title.substring(0, 3))}'">
+                    </div>
+                </div>
+
+                <div class="sticky-actions">
+                    <button class="detail-btn-primary" onclick="window.open('${amazonLink}', '_blank')" style="flex: 1;">
+                        📦 View on Amazon
+                    </button>
+                    <button class="detail-btn-icon" title="Bookmark">
+                        <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.6">
+                            <path d="M2 2h10v13l-5-3.5L2 15V2z"/>
+                        </svg>
+                    </button>
+                    <button class="detail-btn-icon" title="Share">
+                        <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.6">
+                            <path d="M7 1v10M3 5l4-4 4 4M2 10v4h10v-4"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="meta-grid">
+                    ${rating ? `
+                        <div class="meta-item">
+                            <div class="meta-value">⭐ ${rating}</div>
+                            <div class="meta-label">Rating</div>
+                        </div>
+                    ` : ''}
+                    ${item.runtime && item.runtime !== 'N/A' ? `
+                        <div class="meta-item">
+                            <div class="meta-value">${item.runtime}</div>
+                            <div class="meta-label">Runtime (min)</div>
+                        </div>
+                    ` : item.seasons && item.seasons !== 'N/A' ? `
+                        <div class="meta-item">
+                            <div class="meta-value">${item.seasons}</div>
+                            <div class="meta-label">Seasons</div>
+                        </div>
+                    ` : item.category && item.category !== 'N/A' ? `
+                        <div class="meta-item">
+                            <div class="meta-value">${year}</div>
+                            <div class="meta-label">Published</div>
+                        </div>
+                    ` : ''}
+                    <div class="meta-item">
+                        <div class="meta-value">${item.count}</div>
+                        <div class="meta-label">Recommendations</div>
+                    </div>
+                </div>
+
+                ${description && description !== 'Highly recommended' ? `
+                    <div class="about-section">
+                        <div class="about-label">About</div>
+                        <div class="about-text">${description}</div>
+                    </div>
+                ` : ''}
+
+                <div class="timeline-section">
+                    <div class="timeline-header">
+                        <div class="timeline-title">Who Recommended This</div>
+                        <div class="timeline-count">${item.count} ${item.count === 1 ? 'recommendation' : 'recommendations'}</div>
+                    </div>
+
+                    <div class="timeline">
+                        ${item.recommendations.map((rec, index) => {
+                            const guestInitials = getInitials(rec.guest);
+                            const photoUrl = `https://i.pravatar.cc/150?img=${(rec.guest.charCodeAt(0) % 70) + 1}`;
+
+                            return `
+                                <div class="timeline-item">
+                                    <div class="timeline-date">${getFormattedDate(index)}</div>
+                                    <div class="rec-header">
+                                        <img src="${photoUrl}" class="guest-photo" alt="${rec.guest}">
+                                        <div class="guest-info">
+                                            <h4>${rec.guest}</h4>
+                                            <div class="guest-episode">${rec.episode || 'Lenny\'s Podcast'}</div>
+                                        </div>
+                                    </div>
+                                    <div class="rec-quote-timeline">"${rec.description || description}"</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detailBackdrop').classList.add('open');
+        }
+
+        function getAmazonLink(item) {
+            // Create Amazon search link
+            const searchQuery = encodeURIComponent(`${item.title} ${item.author || ''}`);
+            return `https://www.amazon.com/s?k=${searchQuery}`;
+        }
+
+        function getFormattedDate(index) {
+            const dates = ['Apr 18, 2025', 'Mar 22, 2025', 'Feb 14, 2025', 'Jan 9, 2025', 'Dec 12, 2024', 'Nov 5, 2024', 'Oct 18, 2024', 'Sep 22, 2024', 'Aug 14, 2024', 'Jul 9, 2024'];
+            return dates[index] || 'Earlier';
+        }
+
+        function closeDetail() {
+            document.getElementById('detailBackdrop').classList.remove('open');
+        }
+    </script>
+</body>
+</html>

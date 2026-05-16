@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Recommendations - Design Options</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background: #f5f5f0;
+            color: #14120e;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 42px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #14120e;
+        }
+
+        .subtitle {
+            font-family: 'Instrument Serif', serif;
+            font-size: 18px;
+            color: rgba(20,18,14,0.6);
+            margin-bottom: 50px;
+            font-style: italic;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .option-card {
+            background: #fafaf7;
+            border: 1px solid #ece7de;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        .option-header {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #14120e;
+        }
+
+        .option-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(20,18,14,0.5);
+            margin-bottom: 8px;
+        }
+
+        .option-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .option-desc {
+            font-family: 'Instrument Serif', serif;
+            font-size: 14px;
+            color: rgba(20,18,14,0.6);
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* Mock book header */
+        .mock-book {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #fff;
+            border: 1px solid #ece7de;
+            border-radius: 12px;
+        }
+
+        .mock-cover {
+            width: 60px;
+            height: 86px;
+            background: linear-gradient(135deg, #c46640, #8a3d20);
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .mock-info h3 {
+            font-family: 'Fraunces', serif;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .mock-info p {
+            font-family: 'Instrument Serif', serif;
+            font-size: 12px;
+            color: rgba(20,18,14,0.6);
+            font-style: italic;
+        }
+
+        .rec-count {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 3px 8px;
+            background: rgba(196,102,64,0.15);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            color: #c46640;
+        }
+
+        /* Option 1: Expandable */
+        .expand-trigger {
+            padding: 12px;
+            background: #f4f1eb;
+            border: 1px solid #ece7de;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-family: 'Fraunces', serif;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .expand-trigger:hover {
+            background: #ece7de;
+        }
+
+        .expand-trigger.open {
+            background: #14120e;
+            color: #fafaf7;
+        }
+
+        .expandable-list {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .expandable-list.open {
+            display: block;
+        }
+
+        .rec-item {
+            padding: 14px;
+            background: #fff;
+            border: 1px solid #ece7de;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .rec-item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #c46640, #8a3d20);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .rec-guest {
+            font-family: 'Fraunces', serif;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .rec-episode {
+            font-size: 11px;
+            color: rgba(20,18,14,0.5);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .rec-quote {
+            font-family: 'Instrument Serif', serif;
+            font-size: 13px;
+            font-style: italic;
+            line-height: 1.4;
+            color: rgba(20,18,14,0.75);
+        }
+
+        /* Option 2: Stacked Avatars */
+        .avatar-stack {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .avatar-group {
+            display: flex;
+            margin-right: 12px;
+        }
+
+        .avatar-group .avatar {
+            margin-left: -12px;
+            border: 2px solid #fafaf7;
+        }
+
+        .avatar-group .avatar:first-child {
+            margin-left: 0;
+        }
+
+        .more-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: rgba(20,18,14,0.6);
+        }
+
+        .popover {
+            background: #fff;
+            border: 1px solid #ece7de;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        /* Option 3: Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 16px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ece7de;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #ece7de;
+            border-radius: 10px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -21px;
+            top: 20px;
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: #c46640;
+            border: 2px solid #fafaf7;
+        }
+
+        .timeline-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: rgba(20,18,14,0.5);
+            margin-bottom: 6px;
+        }
+
+        /* Option 4: Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #ece7de;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-family: 'Fraunces', serif;
+            font-size: 14px;
+            cursor: pointer;
+            color: rgba(20,18,14,0.5);
+        }
+
+        .tab.active {
+            color: #14120e;
+            font-weight: 500;
+            border-bottom-color: #14120e;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Option 5: Carousel */
+        .carousel {
+            position: relative;
+            background: #fff;
+            border: 1px solid #ece7de;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+        }
+
+        .carousel-quote {
+            font-family: 'Instrument Serif', serif;
+            font-size: 16px;
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            min-height: 80px;
+        }
+
+        .carousel-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .carousel-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #ece7de;
+            cursor: pointer;
+        }
+
+        .nav-dot.active {
+            background: #c46640;
+            width: 24px;
+        }
+
+        /* Option 6: Grid of portraits */
+        .portrait-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .portrait-item {
+            text-align: center;
+            cursor: pointer;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #ece7de;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .portrait-item:hover {
+            border-color: #c46640;
+            transform: translateY(-2px);
+        }
+
+        .portrait-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #c46640, #8a3d20);
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .portrait-name {
+            font-family: 'Fraunces', serif;
+            font-size: 11px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .portrait-ep {
+            font-size: 9px;
+            color: rgba(20,18,14,0.5);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .selected-quote {
+            padding: 14px;
+            background: #f4f1eb;
+            border-left: 3px solid #c46640;
+            border-radius: 6px;
+            font-family: 'Instrument Serif', serif;
+            font-size: 13px;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .pros-cons {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f4f1eb;
+            border-radius: 8px;
+        }
+
+        .pros-cons-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(20,18,14,0.6);
+            margin-bottom: 8px;
+        }
+
+        .pros-cons ul {
+            list-style: none;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .pros-cons li {
+            padding-left: 16px;
+            position: relative;
+            margin-bottom: 4px;
+        }
+
+        .pros-cons li::before {
+            content: '•';
+            position: absolute;
+            left: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Multiple Recommendations Design Options</h1>
+        <p class="subtitle">Exploring different ways to show all the people who recommended a book/movie/TV show and why</p>
+
+        <div class="grid">
+            <!-- Option 1 -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-number">Option 1</div>
+                    <div class="option-title">Expandable List</div>
+                    <div class="option-desc">Click to expand and see all recommenders with their quotes. Clean, scannable, doesn't overwhelm initially.</div>
+                </div>
+
+                <div class="mock-book">
+                    <div class="mock-cover">BOOK</div>
+                    <div class="mock-info">
+                        <h3>The Hard Thing About Hard Things</h3>
+                        <p>Ben Horowitz</p>
+                        <span class="rec-count">7× RECOMMENDED</span>
+                    </div>
+                </div>
+
+                <div class="expand-trigger" onclick="toggleExpand(this)">
+                    ↓ See all 7 recommendations
+                </div>
+
+                <div class="expandable-list">
+                    <div class="rec-item">
+                        <div class="rec-item-header">
+                            <div class="avatar">LR</div>
+                            <div>
+                                <div class="rec-guest">Lenny Rachitsky</div>
+                                <div class="rec-episode">Ep. 284 • Apr 18, 2025</div>
+                            </div>
+                        </div>
+                        <div class="rec-quote">"This book changed how I think about making hard decisions when there's no clear right answer."</div>
+                    </div>
+
+                    <div class="rec-item">
+                        <div class="rec-item-header">
+                            <div class="avatar">TF</div>
+                            <div>
+                                <div class="rec-guest">Tim Ferriss</div>
+                                <div class="rec-episode">Ep. 743 • Mar 22, 2025</div>
+                            </div>
+                        </div>
+                        <div class="rec-quote">"Ben's honesty about the messy reality of building companies is refreshing."</div>
+                    </div>
+
+                    <div class="rec-item">
+                        <div class="rec-item-header">
+                            <div class="avatar">SP</div>
+                            <div>
+                                <div class="rec-guest">Shane Parrish</div>
+                                <div class="rec-episode">Ep. 412 • Feb 14, 2025</div>
+                            </div>
+                        </div>
+                        <div class="rec-quote">"Required reading for anyone in a leadership position."</div>
+                    </div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros-cons-title">Pros & Cons</div>
+                    <ul>
+                        <li>✅ Clean initial view</li>
+                        <li>✅ Easy to scan all at once</li>
+                        <li>✅ Shows chronology</li>
+                        <li>⚠️ Requires click to see details</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Option 2 -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-number">Option 2</div>
+                    <div class="option-title">Stacked Avatars + Popover</div>
+                    <div class="option-desc">Visual representation of "many people love this". Hover or click to see details.</div>
+                </div>
+
+                <div class="mock-book">
+                    <div class="mock-cover">BOOK</div>
+                    <div class="mock-info">
+                        <h3>The Hard Thing About Hard Things</h3>
+                        <p>Ben Horowitz</p>
+                        <span class="rec-count">7× RECOMMENDED</span>
+                    </div>
+                </div>
+
+                <div class="avatar-stack">
+                    <div class="avatar-group">
+                        <div class="avatar">LR</div>
+                        <div class="avatar">TF</div>
+                        <div class="avatar">SP</div>
+                        <div class="avatar">+4</div>
+                    </div>
+                    <div class="more-count">recommended this</div>
+                </div>
+
+                <div class="popover">
+                    <div class="rec-item">
+                        <div class="rec-item-header">
+                            <div class="avatar">LR</div>
+                            <div>
+                                <div class="rec-guest">Lenny Rachitsky</div>
+                                <div class="rec-episode">Ep. 284</div>
+                            </div>
+                        </div>
+                        <div class="rec-quote">"This book changed how I think about making hard decisions."</div>
+                    </div>
+
+                    <div class="rec-item">
+                        <div class="rec-item-header">
+                            <div class="avatar">TF</div>
+                            <div>
+                                <div class="rec-guest">Tim Ferriss</div>
+                                <div class="rec-episode">Ep. 743</div>
+                            </div>
+                        </div>
+                        <div class="rec-quote">"Ben's honesty about the messy reality of building companies is refreshing."</div>
+                    </div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros-cons-title">Pros & Cons</div>
+                    <ul>
+                        <li>✅ Very visual/engaging</li>
+                        <li>✅ Shows social proof</li>
+                        <li>⚠️ Avatars may be too small</li>
+                        <li>⚠️ Requires hover/click interaction</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Option 3 -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-number">Option 3</div>
+                    <div class="option-title">Timeline / Chronological</div>
+                    <div class="option-desc">Shows when each recommendation happened. Gives sense of "this keeps coming up".</div>
+                </div>
+
+                <div class="mock-book">
+                    <div class="mock-cover">BOOK</div>
+                    <div class="mock-info">
+                        <h3>The Hard Thing About Hard Things</h3>
+                        <p>Ben Horowitz</p>
+                        <span class="rec-count">7× RECOMMENDED</span>
+                    </div>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">Apr 18, 2025</div>
+                        <div class="rec-item-header">
+                            <div class="avatar">LR</div>
+                            <div>
+                                <div class="rec-guest">Lenny Rachitsky</div>
+                            </div>
+                        </div>
+                        <div class="rec-quote">"This book changed how I think about making hard decisions."</div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-date">Mar 22, 2025</div>
+                        <div class="rec-item-header">
+                            <div class="avatar">TF</div>
+                            <div>
+                                <div class="rec-guest">Tim Ferriss</div>
+                            </div>
+                        </div>
+                        <div class="rec-quote">"Ben's honesty about the messy reality is refreshing."</div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-date">Feb 14, 2025</div>
+                        <div class="rec-item-header">
+                            <div class="avatar">SP</div>
+                            <div>
+                                <div class="rec-guest">Shane Parrish</div>
+                            </div>
+                        </div>
+                        <div class="rec-quote">"Required reading for anyone in leadership."</div>
+                    </div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros-cons-title">Pros & Cons</div>
+                    <ul>
+                        <li>✅ Shows temporal pattern</li>
+                        <li>✅ Everything visible at once</li>
+                        <li>✅ Editorial/curated feel</li>
+                        <li>⚠️ Takes more vertical space</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Option 4 -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-number">Option 4</div>
+                    <div class="option-title">Tabs (Overview / All Recs)</div>
+                    <div class="option-desc">Clean separation. Default view stays simple, detailed view available via tab.</div>
+                </div>
+
+                <div class="mock-book">
+                    <div class="mock-cover">BOOK</div>
+                    <div class="mock-info">
+                        <h3>The Hard Thing About Hard Things</h3>
+                        <p>Ben Horowitz</p>
+                        <span class="rec-count">7× RECOMMENDED</span>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab(this, 0)">Overview</button>
+                    <button class="tab" onclick="switchTab(this, 1)">All 7 recommendations</button>
+                </div>
+
+                <div class="tab-content active">
+                    <div class="rec-quote" style="padding: 16px; background: #f4f1eb; border-radius: 8px;">
+                        "This book changed how I think about making hard decisions when there's no clear right answer."
+                        <div style="margin-top: 12px; font-size: 12px; color: rgba(20,18,14,0.6);">— Lenny Rachitsky, Ep. 284</div>
+                    </div>
+                </div>
+
+                <div class="tab-content">
+                    <div class="rec-item">
+                        <div class="rec-item-header">
+                            <div class="avatar">LR</div>
+                            <div>
+                                <div class="rec-guest">Lenny Rachitsky</div>
+                                <div class="rec-episode">Ep. 284</div>
+                            </div>
+                        </div>
+                        <div class="rec-quote">"This book changed how I think about making hard decisions."</div>
+                    </div>
+
+                    <div class="rec-item">
+                        <div class="rec-item-header">
+                            <div class="avatar">TF</div>
+                            <div>
+                                <div class="rec-guest">Tim Ferriss</div>
+                                <div class="rec-episode">Ep. 743</div>
+                            </div>
+                        </div>
+                        <div class="rec-quote">"Ben's honesty about the messy reality is refreshing."</div>
+                    </div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros-cons-title">Pros & Cons</div>
+                    <ul>
+                        <li>✅ Very clean separation</li>
+                        <li>✅ Doesn't overwhelm</li>
+                        <li>⚠️ Hides content behind tabs</li>
+                        <li>⚠️ Less discoverable</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Option 5 -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-number">Option 5</div>
+                    <div class="option-title">Carousel of Quotes</div>
+                    <div class="option-desc">Swipeable carousel. Each quote gets full attention. Good for browsing perspectives.</div>
+                </div>
+
+                <div class="mock-book">
+                    <div class="mock-cover">BOOK</div>
+                    <div class="mock-info">
+                        <h3>The Hard Thing About Hard Things</h3>
+                        <p>Ben Horowitz</p>
+                        <span class="rec-count">7× RECOMMENDED</span>
+                    </div>
+                </div>
+
+                <div class="carousel">
+                    <div class="carousel-quote">
+                        "This book changed how I think about making hard decisions when there's no clear right answer. The chapter on wartime vs peacetime CEO is brilliant."
+                    </div>
+                    <div class="carousel-footer">
+                        <div>
+                            <div class="rec-guest">Lenny Rachitsky</div>
+                            <div class="rec-episode">Ep. 284 • Apr 18, 2025</div>
+                        </div>
+                        <div class="carousel-nav">
+                            <div class="nav-dot active"></div>
+                            <div class="nav-dot"></div>
+                            <div class="nav-dot"></div>
+                            <div class="nav-dot"></div>
+                            <div class="nav-dot"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(20,18,14,0.5); margin-top: 12px;">
+                    ← Swipe to see more recommendations →
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros-cons-title">Pros & Cons</div>
+                    <ul>
+                        <li>✅ Each quote gets space</li>
+                        <li>✅ Fun to browse</li>
+                        <li>✅ Mobile-friendly swipe</li>
+                        <li>⚠️ Can't see all at once</li>
+                        <li>⚠️ Requires interaction</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Option 6 -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-number">Option 6</div>
+                    <div class="option-title">Grid of Portraits</div>
+                    <div class="option-desc">Visual grid of guest photos. Click any to see their specific quote. More engaging than text.</div>
+                </div>
+
+                <div class="mock-book">
+                    <div class="mock-cover">BOOK</div>
+                    <div class="mock-info">
+                        <h3>The Hard Thing About Hard Things</h3>
+                        <p>Ben Horowitz</p>
+                        <span class="rec-count">7× RECOMMENDED</span>
+                    </div>
+                </div>
+
+                <div class="portrait-grid">
+                    <div class="portrait-item">
+                        <div class="portrait-avatar">LR</div>
+                        <div class="portrait-name">Lenny R.</div>
+                        <div class="portrait-ep">Ep. 284</div>
+                    </div>
+                    <div class="portrait-item">
+                        <div class="portrait-avatar">TF</div>
+                        <div class="portrait-name">Tim F.</div>
+                        <div class="portrait-ep">Ep. 743</div>
+                    </div>
+                    <div class="portrait-item">
+                        <div class="portrait-avatar">SP</div>
+                        <div class="portrait-name">Shane P.</div>
+                        <div class="portrait-ep">Ep. 412</div>
+                    </div>
+                    <div class="portrait-item">
+                        <div class="portrait-avatar">SD</div>
+                        <div class="portrait-name">Shreyas D.</div>
+                        <div class="portrait-ep">Ep. 301</div>
+                    </div>
+                </div>
+
+                <div class="selected-quote">
+                    "This book changed how I think about making hard decisions when there's no clear right answer." — Lenny Rachitsky
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros-cons-title">Pros & Cons</div>
+                    <ul>
+                        <li>✅ Very visual/engaging</li>
+                        <li>✅ Clear who recommended</li>
+                        <li>✅ Interactive exploration</li>
+                        <li>⚠️ Requires clicking each person</li>
+                        <li>⚠️ Needs good photos/avatars</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 60px; padding: 32px; background: #14120e; color: #fafaf7; border-radius: 16px; text-align: center;">
+            <h2 style="font-family: 'Fraunces', serif; font-size: 28px; margin-bottom: 16px;">Which direction feels right?</h2>
+            <p style="font-family: 'Instrument Serif', serif; font-size: 16px; font-style: italic; opacity: 0.8;">Let me know and I'll implement it into the live design!</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleExpand(el) {
+            const list = el.nextElementSibling;
+            const isOpen = list.classList.contains('open');
+
+            if (isOpen) {
+                list.classList.remove('open');
+                el.classList.remove('open');
+                el.textContent = '↓ See all 7 recommendations';
+            } else {
+                list.classList.add('open');
+                el.classList.add('open');
+                el.textContent = '↑ Hide recommendations';
+            }
+        }
+
+        function switchTab(el, index) {
+            const card = el.closest('.option-card');
+            const tabs = card.querySelectorAll('.tab');
+            const contents = card.querySelectorAll('.tab-content');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+
+            el.classList.add('active');
+            contents[index].classList.add('active');
+        }
+    </script>
+</body>
+</html>

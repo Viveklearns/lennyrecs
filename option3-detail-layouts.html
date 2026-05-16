@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Option 3 Detail View - Layout Options</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background: #f5f5f0;
+            color: #14120e;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 42px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #14120e;
+        }
+
+        .subtitle {
+            font-family: 'Instrument Serif', serif;
+            font-size: 18px;
+            color: rgba(20,18,14,0.6);
+            margin-bottom: 50px;
+            font-style: italic;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .layout-card {
+            background: #fafaf7;
+            border: 1px solid #ece7de;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        .layout-header {
+            padding: 24px;
+            background: #14120e;
+            color: #fafaf7;
+        }
+
+        .layout-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .layout-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .layout-desc {
+            font-family: 'Instrument Serif', serif;
+            font-size: 14px;
+            opacity: 0.85;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .layout-body {
+            padding: 0;
+        }
+
+        /* Mock detail sheet */
+        .detail-sheet {
+            background: #fafaf7;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .detail-header {
+            padding: 28px 24px;
+            background: linear-gradient(135deg, #c46640, #8a3d20);
+            color: #fff;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .detail-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.85;
+            margin-bottom: 12px;
+        }
+
+        .detail-title-section {
+            display: grid;
+            grid-template-columns: 1fr 100px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .detail-title {
+            font-family: 'Fraunces', serif;
+            font-size: 32px;
+            font-weight: 400;
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .detail-author {
+            font-size: 15px;
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .detail-cover {
+            width: 100px;
+            height: 145px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .action-bar {
+            padding: 16px 24px;
+            background: #fff;
+            border-bottom: 1px solid #ece7de;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 12px 20px;
+            background: #14120e;
+            color: #fafaf7;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Fraunces', serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            padding: 12px 16px;
+            background: #f4f1eb;
+            color: #14120e;
+            border: 1px solid #ece7de;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .info-section {
+            padding: 20px 24px;
+            background: #fff;
+            border-bottom: 1px solid #ece7de;
+        }
+
+        .info-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(20,18,14,0.5);
+            margin-bottom: 8px;
+        }
+
+        .info-content {
+            font-family: 'Instrument Serif', serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(20,18,14,0.8);
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 16px 24px;
+            background: #f4f1eb;
+            border-bottom: 1px solid #ece7de;
+        }
+
+        .meta-item {
+            text-align: center;
+        }
+
+        .meta-value {
+            font-family: 'Fraunces', serif;
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .meta-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(20,18,14,0.5);
+        }
+
+        .tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            background: rgba(196,102,64,0.1);
+            border: 1px solid rgba(196,102,64,0.2);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #c46640;
+            font-weight: 500;
+        }
+
+        .timeline-section {
+            padding: 24px;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timeline-title {
+            font-family: 'Fraunces', serif;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .timeline-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: rgba(20,18,14,0.5);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ece7de;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #fff;
+            border: 1px solid #ece7de;
+            border-radius: 12px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 24px;
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: #c46640;
+            border: 3px solid #fafaf7;
+            z-index: 2;
+        }
+
+        .timeline-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: rgba(20,18,14,0.5);
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .rec-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .guest-photo {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #c46640, #8a3d20);
+        }
+
+        .guest-info h4 {
+            font-family: 'Fraunces', serif;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .guest-episode {
+            font-size: 11px;
+            color: rgba(20,18,14,0.5);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .rec-quote {
+            font-family: 'Instrument Serif', serif;
+            font-size: 14px;
+            font-style: italic;
+            line-height: 1.5;
+            color: rgba(20,18,14,0.8);
+            padding-left: 12px;
+            border-left: 3px solid #ece7de;
+            margin-bottom: 10px;
+        }
+
+        .listen-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f4f1eb;
+            border: 1px solid #ece7de;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            text-decoration: none;
+            color: #14120e;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .listen-link:hover {
+            background: #14120e;
+            color: #fafaf7;
+            border-color: #14120e;
+        }
+
+        /* Layout A specific */
+        .sidebar-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+        }
+
+        .sidebar {
+            background: #f4f1eb;
+            padding: 24px;
+            border-right: 1px solid #ece7de;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        /* Layout B specific */
+        .floating-actions {
+            position: sticky;
+            top: 0;
+            background: rgba(250,250,247,0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            border-bottom: 1px solid #ece7de;
+            z-index: 10;
+        }
+
+        /* Layout C specific */
+        .compact-info {
+            padding: 16px 24px;
+            background: #fff;
+            border-bottom: 1px solid #ece7de;
+        }
+
+        .info-chips {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .info-chip {
+            padding: 6px 12px;
+            background: #f4f1eb;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        .info-chip strong {
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+        }
+
+        /* Related books */
+        .related-section {
+            padding: 20px 24px;
+            background: #f4f1eb;
+            border-top: 1px solid #ece7de;
+        }
+
+        .related-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: 12px 0;
+        }
+
+        .related-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .related-book {
+            flex-shrink: 0;
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .related-cover {
+            width: 80px;
+            height: 115px;
+            background: linear-gradient(135deg, #8a3d20, #c46640);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .related-title {
+            font-size: 10px;
+            line-height: 1.3;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Option 3 Detail View - Layout Options</h1>
+        <p class="subtitle">Three different ways to organize all the information when someone clicks on a book. Each includes guest photos, Amazon link, timeline, and metadata.</p>
+
+        <div class="layout-grid">
+            <!-- Layout A: Sidebar Layout -->
+            <div class="layout-card">
+                <div class="layout-header">
+                    <div class="layout-number">Layout A</div>
+                    <div class="layout-title">Sidebar Information</div>
+                    <div class="layout-desc">All metadata and actions in a fixed sidebar. Timeline scrolls on the right. Clean separation of info vs. recommendations.</div>
+                </div>
+                <div class="layout-body">
+                    <div class="detail-sheet">
+                        <div class="detail-header">
+                            <button class="close-btn">×</button>
+                            <div class="detail-meta">Book · 7× recommended</div>
+                            <div class="detail-title-section">
+                                <div>
+                                    <div class="detail-title">The Hard Thing About Hard Things</div>
+                                    <div class="detail-author">Ben Horowitz · 2014</div>
+                                </div>
+                                <div class="detail-cover"></div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-layout">
+                            <div class="sidebar">
+                                <div class="sidebar-section">
+                                    <div class="info-label">Get it</div>
+                                    <button class="btn-primary" style="width: 100%; margin-bottom: 8px;">
+                                        <span>📦</span> View on Amazon
+                                    </button>
+                                    <button class="btn-secondary" style="width: 100%;">
+                                        🔖 Save for later
+                                    </button>
+                                </div>
+
+                                <div class="sidebar-section">
+                                    <div class="info-label">Quick facts</div>
+                                    <div style="font-size: 13px; line-height: 1.8;">
+                                        <div><strong>Genre:</strong> Business & Leadership</div>
+                                        <div><strong>Pages:</strong> 304</div>
+                                        <div><strong>Rating:</strong> ⭐ 4.5/5 (Goodreads)</div>
+                                    </div>
+                                </div>
+
+                                <div class="sidebar-section">
+                                    <div class="info-label">Key themes</div>
+                                    <div class="tags-row">
+                                        <div class="tag">Startups</div>
+                                        <div class="tag">Leadership</div>
+                                        <div class="tag">Decision Making</div>
+                                        <div class="tag">CEO Insights</div>
+                                    </div>
+                                </div>
+
+                                <div class="sidebar-section">
+                                    <div class="info-label">About</div>
+                                    <div class="info-content">
+                                        Ben Horowitz's essential guide to navigating the toughest problems business school doesn't cover.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="padding: 24px;">
+                                <div class="timeline-header">
+                                    <div class="timeline-title">All Recommendations</div>
+                                    <div class="timeline-count">7 guests</div>
+                                </div>
+
+                                <div class="timeline">
+                                    <div class="timeline-item">
+                                        <div class="timeline-date">Apr 18, 2025</div>
+                                        <div class="rec-header">
+                                            <img src="https://i.pravatar.cc/150?img=12" class="guest-photo" alt="Lenny">
+                                            <div class="guest-info">
+                                                <h4>Lenny Rachitsky</h4>
+                                                <div class="guest-episode">Ep. 284 • 42:17</div>
+                                            </div>
+                                        </div>
+                                        <div class="rec-quote">"This book changed how I think about making hard decisions when there's no clear right answer."</div>
+                                        <a href="#" class="listen-link">▶ Listen to this moment</a>
+                                    </div>
+
+                                    <div class="timeline-item">
+                                        <div class="timeline-date">Mar 22, 2025</div>
+                                        <div class="rec-header">
+                                            <img src="https://i.pravatar.cc/150?img=33" class="guest-photo" alt="Tim">
+                                            <div class="guest-info">
+                                                <h4>Tim Ferriss</h4>
+                                                <div class="guest-episode">Ep. 743 • 1:08:45</div>
+                                            </div>
+                                        </div>
+                                        <div class="rec-quote">"Ben's honesty about the messy reality of building companies is refreshing. Required reading."</div>
+                                        <a href="#" class="listen-link">▶ Listen to this moment</a>
+                                    </div>
+
+                                    <div class="timeline-item">
+                                        <div class="timeline-date">Feb 14, 2025</div>
+                                        <div class="rec-header">
+                                            <img src="https://i.pravatar.cc/150?img=57" class="guest-photo" alt="Shane">
+                                            <div class="guest-info">
+                                                <h4>Shane Parrish</h4>
+                                                <div class="guest-episode">Ep. 412 • 28:33</div>
+                                            </div>
+                                        </div>
+                                        <div class="rec-quote">"The wartime vs peacetime CEO framework is something every leader should understand."</div>
+                                        <a href="#" class="listen-link">▶ Listen to this moment</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layout B: Sticky Actions -->
+            <div class="layout-card">
+                <div class="layout-header">
+                    <div class="layout-number">Layout B</div>
+                    <div class="layout-title">Sticky Action Bar</div>
+                    <div class="layout-desc">Amazon link and actions stick to the top as you scroll. All info inline with timeline. Best for long recommendation lists.</div>
+                </div>
+                <div class="layout-body">
+                    <div class="detail-sheet">
+                        <div class="detail-header">
+                            <button class="close-btn">×</button>
+                            <div class="detail-meta">Book · 7× recommended</div>
+                            <div class="detail-title-section">
+                                <div>
+                                    <div class="detail-title">The Hard Thing About Hard Things</div>
+                                    <div class="detail-author">Ben Horowitz · 2014</div>
+                                </div>
+                                <div class="detail-cover"></div>
+                            </div>
+                        </div>
+
+                        <div class="floating-actions">
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-primary">📦 View on Amazon</button>
+                                <button class="btn-secondary">🔖 Save</button>
+                                <button class="btn-secondary">↗ Share</button>
+                            </div>
+                        </div>
+
+                        <div class="meta-grid">
+                            <div class="meta-item">
+                                <div class="meta-value">⭐ 4.5</div>
+                                <div class="meta-label">Goodreads</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value">304</div>
+                                <div class="meta-label">Pages</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value">2014</div>
+                                <div class="meta-label">Published</div>
+                            </div>
+                        </div>
+
+                        <div class="info-section">
+                            <div class="info-label">About this book</div>
+                            <div class="info-content">
+                                Ben Horowitz, cofounder of Andreessen Horowitz and one of Silicon Valley's most respected entrepreneurs, offers essential advice on building and running a startup.
+                            </div>
+                        </div>
+
+                        <div class="info-section" style="background: #f4f1eb;">
+                            <div class="info-label">Key themes</div>
+                            <div class="tags-row">
+                                <div class="tag">Startups</div>
+                                <div class="tag">Leadership</div>
+                                <div class="tag">Decision Making</div>
+                                <div class="tag">CEO Insights</div>
+                                <div class="tag">Business Strategy</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-section">
+                            <div class="timeline-header">
+                                <div class="timeline-title">Who Recommended This</div>
+                                <div class="timeline-count">7 recommendations</div>
+                            </div>
+
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-date">Apr 18, 2025</div>
+                                    <div class="rec-header">
+                                        <img src="https://i.pravatar.cc/150?img=12" class="guest-photo" alt="Lenny">
+                                        <div class="guest-info">
+                                            <h4>Lenny Rachitsky</h4>
+                                            <div class="guest-episode">Lenny's Podcast Ep. 284 • 42:17</div>
+                                        </div>
+                                    </div>
+                                    <div class="rec-quote">"This book changed how I think about making hard decisions when there's no clear right answer. The chapter on wartime vs peacetime CEO is brilliant."</div>
+                                    <a href="#" class="listen-link">▶ Listen to this moment</a>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-date">Mar 22, 2025</div>
+                                    <div class="rec-header">
+                                        <img src="https://i.pravatar.cc/150?img=33" class="guest-photo" alt="Tim">
+                                        <div class="guest-info">
+                                            <h4>Tim Ferriss</h4>
+                                            <div class="guest-episode">The Tim Ferriss Show #743 • 1:08:45</div>
+                                        </div>
+                                    </div>
+                                    <div class="rec-quote">"Ben's honesty about the messy reality of building companies is refreshing. Required reading for anyone thinking about starting a company."</div>
+                                    <a href="#" class="listen-link">▶ Listen to this moment</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="related-section">
+                            <div class="info-label" style="margin-bottom: 8px;">People also recommended</div>
+                            <div class="related-scroll">
+                                <div class="related-book">
+                                    <div class="related-cover"></div>
+                                    <div class="related-title">Zero to One</div>
+                                </div>
+                                <div class="related-book">
+                                    <div class="related-cover"></div>
+                                    <div class="related-title">High Output Management</div>
+                                </div>
+                                <div class="related-book">
+                                    <div class="related-cover"></div>
+                                    <div class="related-title">The Lean Startup</div>
+                                </div>
+                                <div class="related-book">
+                                    <div class="related-cover"></div>
+                                    <div class="related-title">Measure What Matters</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layout C: Compact Info Pills -->
+            <div class="layout-card">
+                <div class="layout-header">
+                    <div class="layout-number">Layout C</div>
+                    <div class="layout-title">Compact Info Pills</div>
+                    <div class="layout-desc">Minimal metadata in small chips. Focus on recommendations. Amazon link prominent at top. Best for clean, uncluttered feel.</div>
+                </div>
+                <div class="layout-body">
+                    <div class="detail-sheet">
+                        <div class="detail-header">
+                            <button class="close-btn">×</button>
+                            <div class="detail-meta">Book · 7× recommended</div>
+                            <div class="detail-title-section">
+                                <div>
+                                    <div class="detail-title">The Hard Thing About Hard Things</div>
+                                    <div class="detail-author">Ben Horowitz · 2014</div>
+                                </div>
+                                <div class="detail-cover"></div>
+                            </div>
+                        </div>
+
+                        <div class="action-bar">
+                            <button class="btn-primary">
+                                📦 View on Amazon
+                            </button>
+                            <button class="btn-secondary">🔖</button>
+                            <button class="btn-secondary">↗</button>
+                        </div>
+
+                        <div class="compact-info">
+                            <div class="info-content" style="margin-bottom: 8px;">
+                                Essential advice on building and running a startup from one of Silicon Valley's most respected entrepreneurs.
+                            </div>
+                            <div class="info-chips">
+                                <div class="info-chip"><strong>⭐ 4.5</strong> Goodreads</div>
+                                <div class="info-chip"><strong>304</strong> pages</div>
+                                <div class="info-chip"><strong>#</strong> Leadership</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-section">
+                            <div class="timeline-header">
+                                <div class="timeline-title">7 Recommendations</div>
+                                <div class="timeline-count">Latest first</div>
+                            </div>
+
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-date">April 18, 2025</div>
+                                    <div class="rec-header">
+                                        <img src="https://i.pravatar.cc/150?img=12" class="guest-photo" alt="Lenny">
+                                        <div class="guest-info">
+                                            <h4>Lenny Rachitsky</h4>
+                                            <div class="guest-episode">Ep. 284 • 42:17</div>
+                                        </div>
+                                    </div>
+                                    <div class="rec-quote">"This book changed how I think about making hard decisions when there's no clear right answer. The chapter on wartime vs peacetime CEO is brilliant."</div>
+                                    <a href="#" class="listen-link">▶ Listen to this moment</a>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-date">March 22, 2025</div>
+                                    <div class="rec-header">
+                                        <img src="https://i.pravatar.cc/150?img=33" class="guest-photo" alt="Tim">
+                                        <div class="guest-info">
+                                            <h4>Tim Ferriss</h4>
+                                            <div class="guest-episode">Ep. 743 • 1:08:45</div>
+                                        </div>
+                                    </div>
+                                    <div class="rec-quote">"Ben's honesty about the messy reality of building companies is refreshing. Required reading for anyone thinking about starting a company."</div>
+                                    <a href="#" class="listen-link">▶ Listen to this moment</a>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-date">February 14, 2025</div>
+                                    <div class="rec-header">
+                                        <img src="https://i.pravatar.cc/150?img=57" class="guest-photo" alt="Shane">
+                                        <div class="guest-info">
+                                            <h4>Shane Parrish</h4>
+                                            <div class="guest-episode">Ep. 412 • 28:33</div>
+                                        </div>
+                                    </div>
+                                    <div class="rec-quote">"The wartime vs peacetime CEO framework is something every leader should understand. This book is packed with real-world wisdom."</div>
+                                    <a href="#" class="listen-link">▶ Listen to this moment</a>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-date">January 9, 2025</div>
+                                    <div class="rec-header">
+                                        <img src="https://i.pravatar.cc/150?img=68" class="guest-photo" alt="Shreyas">
+                                        <div class="guest-info">
+                                            <h4>Shreyas Doshi</h4>
+                                            <div class="guest-episode">Ep. 301 • 56:12</div>
+                                        </div>
+                                    </div>
+                                    <div class="rec-quote">"Every PM and founder should read this. The insights on organizational design are invaluable."</div>
+                                    <a href="#" class="listen-link">▶ Listen to this moment</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 60px; padding: 32px; background: #14120e; color: #fafaf7; border-radius: 16px;">
+            <h2 style="font-family: 'Fraunces', serif; font-size: 28px; margin-bottom: 16px;">Key Features in All Layouts:</h2>
+            <ul style="font-family: 'Instrument Serif', serif; font-size: 16px; line-height: 2; list-style-position: inside; opacity: 0.9;">
+                <li>✅ <strong>Real guest photos</strong> (using placeholder service for now)</li>
+                <li>✅ <strong>Amazon link</strong> prominently displayed</li>
+                <li>✅ <strong>Timeline with all recommendations</strong> in chronological order</li>
+                <li>✅ <strong>"Listen to this moment"</strong> links for each recommendation</li>
+                <li>✅ <strong>Book metadata</strong> (rating, pages, publication year)</li>
+                <li>✅ <strong>Key themes/tags</strong> for quick scanning</li>
+                <li>✅ <strong>Book description</strong> for context</li>
+                <li>✅ <strong>Save/Share buttons</strong> for user actions</li>
+                <li>✅ <strong>Related recommendations</strong> (Layout B shows this)</li>
+            </ul>
+            <p style="font-family: 'Instrument Serif', serif; font-size: 16px; font-style: italic; opacity: 0.8; margin-top: 24px;">
+                Which layout do you prefer? I'll implement it into the live design!
+            </p>
+        </div>
+    </div>
+</body>
+</html>
